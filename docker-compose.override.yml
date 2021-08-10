@@ -1,0 +1,7 @@
+# Use for local-only features not iN ECS
+
+services:
+  flaskapp:
+    build: .                    # ignored by ECS
+    volumes:
+      - .:/app                  # not allowed on ECS, mount host filesystem for local edits

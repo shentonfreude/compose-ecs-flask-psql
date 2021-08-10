@@ -1,0 +1,40 @@
+version: "3"
+
+x-aws-logs_retention: 7          # ECS only
+x-aws-vpc: vpc-0eb412d8f43828513 # ECS only
+
+
+services:
+
+  psql:
+    image: postgres:9.6.2-alpine
+    environment: 
+      POSTGRES_USER:     flaskapp
+      POSTGRES_DB:       flaskapp
+      POSTGRES_PASSWORD: flaskapp
+    healthcheck:
+      test: "pg_isready --username=flaskapp && psql --username=flaskapp --list"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  flaskapp:
+    image: 355255540862.dkr.ecr.us-east-1.amazonaws.com/cshenton/flaskapp:latest
+    # command is in Dockerfile RUN
+    environment:
+      DB_HOST:     psql
+      DB_PORT:     5432
+      DB_NAME:     flaskapp
+      DB_PASSWORD: flaskapp
+      DB_USER:     flaskapp
+    ports:
+      - "80:80"
+    depends_on:
+      psql:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
