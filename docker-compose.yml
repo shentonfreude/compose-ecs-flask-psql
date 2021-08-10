@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 x-aws-logs_retention: 7          # ECS only
 x-aws-vpc: vpc-0eb412d8f43828513 # ECS only
@@ -20,8 +20,10 @@ services:
 
   flaskapp:
     image: 355255540862.dkr.ecr.us-east-1.amazonaws.com/cshenton/flaskapp:latest
-    # command is in Dockerfile RUN
     environment:
+      # Neither bare service "psql",
+      # FQDN "psql.psql.compose-ecs-flask-psql.local",
+      # nor awsvpc "localhost" work.
       DB_HOST:     psql
       DB_PORT:     5432
       DB_NAME:     flaskapp
