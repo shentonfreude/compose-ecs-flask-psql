@@ -1,11 +1,13 @@
-GIT_HASH=$$(git rev-parse --short HEAD)
-TAG_NAME=cshenton/flaskapp
-TAG_SUFFIXED=${TAG_NAME}:latest
-AWS_ACCT=355255540862
-AWS_REGION=us-east-1
-AWS_ECR_URI=${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com
-AWS_ECR_TAG=${AWS_ECR_URI}/${TAG_SUFFIXED}
-AWS_ECR_TAG_HASH=${AWS_ECR_URI}/${TAG_SUFFIXED}-${GIT_HASH}
+TAG_NAME := cshenton/flaskapp
+
+AWS_ACCT         := $(shell aws sts get-caller-identity --query Account --output text)
+AWS_REGION       := us-east-1
+GIT_HASH         := $(shell git rev-parse --short HEAD || echo NOGIT)
+TAG_SUFFIXED     := ${TAG_NAME}:latest
+AWS_ECR_URI      := ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+AWS_ECR_TAG      := ${AWS_ECR_URI}/${TAG_SUFFIXED}
+AWS_ECR_TAG_HASH := ${AWS_ECR_URI}/${TAG_SUFFIXED}-${GIT_HASH}
+
 
 build:
 	docker --context default compose build
