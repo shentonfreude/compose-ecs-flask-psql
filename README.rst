@@ -73,3 +73,47 @@ referencing their FQDNs instead of bare service name in my app, but
 it's no different.
 
 I'm on Docker version 20.10.7, build f0df350.
+
+2021-08-16 Use Default VPC in UE2
+=================================
+
+mreferre says my stack deploys to his default VPC fine, try removing
+``x-aws-vpc`` from Dockerfile and deploy to UE2 default VPC::
+
+  % docker --context wp-dev-ue2 compose -f docker-compose.yml up
+  WARNING networks.driver: unsupported attribute
+  account has no default VPC. Set VPC to deploy to using 'x-aws-vpc'
+
+Notice it says "account", not region. UE1 has no default VPC but UE2
+does, however when I try to "up" there it still complains about
+"account"; if I specify the UE2 default VPC name, it claims it doesn't
+exist -- like it's not getting the right region. In UE2 there is a
+default VPC::
+
+  % aws ec2 describe-vpcs
+  {
+    "Vpcs": [
+        {
+            "CidrBlock": "172.31.0.0/16",
+            "VpcId": "vpc-2395654a",
+            "IsDefault": true,
+
+Our WP and VStudios AWS accounts are EC2 Classic so old regions will
+not have default VPCs. I created a new account, and deployed this to
+it, and it just worked.
+
+Can I create a new VPC that behaves like the account (?) or region
+default VPC?
+
+In the new account there is a default VPC in UE1, UE2:
+UE1 VPC: vpc-f81a6a85
+DNS resolution: Enabled
+DNS hostnames: Enabled
+There is a /20 subnet in all 6 AZs, all "default subnet", auto assign public IP4
+DHCP options set: dopt-03a1bc79 (looks simple)
+Main route table: rtb-e3a65892
+- 172.31.0.0/16 local
+- 0.0.0.0/0: igw-d157f0ab
+Main network ACL: acl-c89c46b4 -- associated with 6 subnets
+- Allow all: src=0.0.0.0/0 Allow
+

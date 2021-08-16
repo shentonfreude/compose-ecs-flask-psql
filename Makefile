@@ -1,7 +1,8 @@
-TAG_NAME := cshenton/flaskapp
+TAG_NAME	 := cshenton/flaskapp
+AWS_REGION       := us-east-1
+ECS_CONTEXT	 := vstudios-ecs
 
 AWS_ACCT         := $(shell aws sts get-caller-identity --query Account --output text)
-AWS_REGION       := us-east-1
 GIT_HASH         := $(shell git rev-parse --short HEAD || echo NOGIT)
 TAG_SUFFIXED     := ${TAG_NAME}:latest
 AWS_ECR_URI      := ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com
@@ -10,10 +11,13 @@ AWS_ECR_TAG_HASH := ${AWS_ECR_URI}/${TAG_SUFFIXED}-${GIT_HASH}
 
 
 build:
-	docker --context default compose build
+	AWS_ACCT=${AWS_ACCT} AWS_REGION=${AWS_REGION} docker --context default compose build
 
 run:
 	docker --context default compose up
+
+# NOTE: The tag in compose includes the ECR region, and it must match here
+# TODO: can we get this from variables? 
 
 # only need to do this once
 ecr_repo:
@@ -24,7 +28,7 @@ ecr_tag:
 	docker --context default tag ${AWS_ECR_TAG} ${AWS_ECR_TAG_HASH}
 
 ecr_login:
-	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ECR_URI}
+	aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ECR_URI}
 
 ecr_push: ecr_tag ecr_login
 	docker --context default push ${AWS_ECR_TAG}
@@ -35,18 +39,18 @@ ecr_list:
 
 # Don't use localhost features from .override.
 up up_ecs:
-	docker --context wp-dev compose -f docker-compose.yml up
+	AWS_ACCT=${AWS_ACCT} AWS_REGION=${AWS_REGION} docker --context ${ECS_CONTEXT} compose -f docker-compose.yml up
 
 deploy: ecr_tag ecr_push up_ecs
 
 down:
-	docker --context wp-dev compose down
+	docker --context ${ECS_CONTEXT} compose down
 
 convert: ecr_login
-	docker --context wp-dev compose convert >cloudformation.yml
+	docker --context ${ECS_CONTEXT} compose convert >cloudformation.yml
 
 logs:
-	docker --context wp-dev compose logs
+	docker --context ${ECS_CONTEXT} compose logs
 
 ps:
-	docker --context wp-dev compose ps
+	docker --context ${ECS_CONTEXT} compose ps

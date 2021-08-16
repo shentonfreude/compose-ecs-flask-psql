@@ -1,12 +1,20 @@
-version: "3.8"
+version: "3"                    # ECS may not like decimal suffix"
 
-x-aws-logs_retention: 7          # ECS only
-x-aws-vpc: vpc-0eb412d8f43828513 # ECS only
+# x-aws-logs_retention: 7          # ECS only
+# x-aws-vpc: vpc-0eb412d8f43828513 # shentonfreude in ue1
+# x-aws-vpc: vpc-2395654a         # UE2 default vpc (not default vpc in UE1)
+#x-aws-vpc: vpc-087f3921182006a92  # UE1 vstudios-ecs I created non-default -- failed
+x-aws-vpc: vpc-0b6188e87c0cdbb60 # UE1 vstudios-ecs "defaultish-vpc"
 
+networks:
+  # YELB says: user defined bridge required; default bridge network doesn't support name resolution
+  flasknet:
+    driver: bridge              # compose up to ECS: WARNING networks.driver: unsupported attribute
 
 services:
 
   psql:
+    container_name: psql
     image: postgres:9.6.2-alpine
     environment: 
       POSTGRES_USER:     flaskapp
@@ -17,9 +25,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - flasknet
 
   flaskapp:
-    image: 355255540862.dkr.ecr.us-east-1.amazonaws.com/cshenton/flaskapp:latest
+    container_name: flaskapp
+    # Must be an ECR tag for ECS to find the image
+    # image: cshenton/flaskapp    # must tag with ECR name to push there
+    image: ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com/cshenton/flaskapp:latest
     environment:
       # Neither bare service "psql",
       # FQDN "psql.psql.compose-ecs-flask-psql.local",
@@ -39,4 +52,5 @@ services:
         limits:
           cpus: "0.5"
           memory: 512M
-
+    networks:
+      - flasknet
