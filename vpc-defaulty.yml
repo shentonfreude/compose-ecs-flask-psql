@@ -1,4 +1,7 @@
-# VPC with IGW, Default Route, 2 public subnets -- must EnableDnsHostnames for Fargate
+# VPC with IGW, Default Route, 2 public subnets.
+# VPC must EnableDnsHostnames for Fargate Service Discovery by Docker service name.
+# Subnets do not need MapPublicIpOnLaunch.
+
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -38,7 +41,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select [ 0, !GetAZs ]
       CidrBlock: 10.0.0.0/20
-      MapPublicIpOnLaunch: true
       VpcId: !Ref VPC
       Tags:
       - Key: Name
@@ -48,7 +50,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select [ 1, !GetAZs ]
       CidrBlock: 10.0.16.0/20
-      MapPublicIpOnLaunch: true
       VpcId: !Ref VPC
       Tags:
       - Key: Name

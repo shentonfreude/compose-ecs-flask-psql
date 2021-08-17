@@ -1,7 +1,6 @@
 # ECS-specific features and customizations
 
-#x-aws-vpc: vpc-0af4ec9d6e4096f52 # vpc-defaulty in wp-dev in ue1
-x-aws-vpc: vpc-07485a3447c60b218	# vpc-fargate in wp-dev ue1
+x-aws-vpc: vpc-0af4ec9d6e4096f52 # vpc-defaulty in wp-dev in ue1
 
 x-aws-logs_retention: 7
 
