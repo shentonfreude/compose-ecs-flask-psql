@@ -1,11 +1,5 @@
 version: "3"                    # ECS may not like decimal suffix"
 
-# x-aws-logs_retention: 7          # ECS only
-# x-aws-vpc: vpc-0eb412d8f43828513 # shentonfreude in ue1
-# x-aws-vpc: vpc-2395654a         # UE2 default vpc (not default vpc in UE1)
-#x-aws-vpc: vpc-087f3921182006a92  # UE1 vstudios-ecs I created non-default -- failed
-x-aws-vpc: vpc-0b6188e87c0cdbb60 # UE1 vstudios-ecs "defaultish-vpc"
-
 networks:
   # YELB says: user defined bridge required; default bridge network doesn't support name resolution
   flasknet:
@@ -30,7 +24,7 @@ services:
 
   flaskapp:
     container_name: flaskapp
-    # Must be an ECR tag for ECS to find the image
+    # For local, we get simple name from .override.; for ECS we need full ECR name in .ecs.
     # image: cshenton/flaskapp    # must tag with ECR name to push there
     image: ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com/cshenton/flaskapp:latest
     environment:

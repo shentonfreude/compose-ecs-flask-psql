@@ -1,7 +1,8 @@
-# Use for local-only features not iN ECS
+# Use for local-only features not in ECS
 
 services:
   flaskapp:
-    build: .                    # ignored by ECS
+    build: .                    # ignored by ECS, needed for local build
+    image: cshenton/flaskapp    # for local, we don't need no steekin' ECR name
     volumes:
       - .:/app                  # not allowed on ECS, mount host filesystem for local edits

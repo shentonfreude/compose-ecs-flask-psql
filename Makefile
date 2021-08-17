@@ -1,6 +1,6 @@
 TAG_NAME	 := cshenton/flaskapp
 AWS_REGION       := us-east-1
-ECS_CONTEXT	 := vstudios-ecs
+ECS_CONTEXT	 := wp-dev
 
 AWS_ACCT         := $(shell aws sts get-caller-identity --query Account --output text)
 GIT_HASH         := $(shell git rev-parse --short HEAD || echo NOGIT)
@@ -10,22 +10,22 @@ AWS_ECR_TAG      := ${AWS_ECR_URI}/${TAG_SUFFIXED}
 AWS_ECR_TAG_HASH := ${AWS_ECR_URI}/${TAG_SUFFIXED}-${GIT_HASH}
 
 
+# We must build locally, and we can run it locally too
+
 build:
 	AWS_ACCT=${AWS_ACCT} AWS_REGION=${AWS_REGION} docker --context default compose build
 
 run:
 	docker --context default compose up
 
-# NOTE: The tag in compose includes the ECR region, and it must match here
-# TODO: can we get this from variables? 
-
 # only need to do this once
 ecr_repo:
 	aws ecr create-repository --repository-name ${TAG_NAME}
 
-# If we want a different tag than that spec'd in compose
+# Must tag our local short name with one that ECR recognizes
 ecr_tag:
-	docker --context default tag ${AWS_ECR_TAG} ${AWS_ECR_TAG_HASH}
+	docker --context default tag ${TAG_NAME} ${AWS_ECR_TAG}
+	docker --context default tag ${TAG_NAME} ${AWS_ECR_TAG_HASH}
 
 ecr_login:
 	aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ECR_URI}
@@ -37,17 +37,19 @@ ecr_push: ecr_tag ecr_login
 ecr_list:
 	aws ecr describe-images --repository-name ${TAG_NAME}
 
-# Don't use localhost features from .override.
-up up_ecs:
-	AWS_ACCT=${AWS_ACCT} AWS_REGION=${AWS_REGION} docker --context ${ECS_CONTEXT} compose -f docker-compose.yml up
+# Explicit config files avoid using local-only features from .override.
+up:
+	AWS_ACCT=${AWS_ACCT} AWS_REGION=${AWS_REGION} \
+	docker --context ${ECS_CONTEXT} \
+	compose -f docker-compose.yml -f docker-compose.ecs.yml up
 
-deploy: ecr_tag ecr_push up_ecs
+deploy: ecr_tag ecr_push up
 
 down:
 	docker --context ${ECS_CONTEXT} compose down
 
 convert: ecr_login
-	docker --context ${ECS_CONTEXT} compose convert >cloudformation.yml
+	docker --context ${ECS_CONTEXT} compose convert > cloudformation-`date +%Y%m%dT%H%M%S`.yml
 
 logs:
 	docker --context ${ECS_CONTEXT} compose logs
