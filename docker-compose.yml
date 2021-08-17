@@ -1,14 +1,8 @@
-version: "3"                    # ECS may not like decimal suffix"
-
-networks:
-  # YELB says: user defined bridge required; default bridge network doesn't support name resolution
-  flasknet:
-    driver: bridge              # compose up to ECS: WARNING networks.driver: unsupported attribute
+version: "3"
 
 services:
 
   psql:
-    container_name: psql
     image: postgres:9.6.2-alpine
     environment: 
       POSTGRES_USER:     flaskapp
@@ -19,18 +13,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - flasknet
 
   flaskapp:
-    container_name: flaskapp
-    # For local, we get simple name from .override.; for ECS we need full ECR name in .ecs.
-    # image: cshenton/flaskapp    # must tag with ECR name to push there
-    image: ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com/cshenton/flaskapp:latest
     environment:
-      # Neither bare service "psql",
-      # FQDN "psql.psql.compose-ecs-flask-psql.local",
-      # nor awsvpc "localhost" work.
       DB_HOST:     psql
       DB_PORT:     5432
       DB_NAME:     flaskapp
@@ -46,5 +31,3 @@ services:
         limits:
           cpus: "0.5"
           memory: 512M
-    networks:
-      - flasknet

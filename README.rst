@@ -107,5 +107,10 @@ Turned out this problem occurred with an existing VPC I was reusing. I
 don't know what it was missing, but deploying and using
 ``vpc-defaulty.yml`` fixed my problem.
 
+I was even able to remove the ``networks.driver: bridge`` that
+mreferre's YELB repo indicates is critical, thought the ECS deploy
+says it's ignored. I believe this is because Fargate always uses
+``awsvpc`` networking.
+
 I hope this repo and lessons learned the hard way may help someone
 else.
