@@ -39,7 +39,7 @@ Deploy to ECS
 
 Now we want to deploy it to AWS ECS, which Docker Compose now can do
 for you! We'll need a VPC with at least 2 public subnets for the ALB.
-You can use the vpc-defaulty.yml to create one if you need; I had
+You can use the ``vpc-defaulty.yml`` to create one if you need; I had
 problems with others I used, and this was about as simple as I could
 make it.
 
@@ -96,16 +96,16 @@ stack is removed)::
 The Docker ECS docs about `service names
 <https://docs.docker.com/cloud/ecs-integration/#service-names>`_
 indicates this works out of the box, via AWS Cloud Map, but it's not
-resolving DNS names to servcies for me. I saw the AWS CloudMap and
+resolving DNS names to services for me. I saw the AWS CloudMap and
 private DNS looked sane. Using private FQDNs didn't help either.
 
 AWS' Massimo Re Ferre' (mreferre) was exceptionally helpful on Stack
 Overflow, I really appreciate his insights:
 https://stackoverflow.com/questions/68764699/docker-compose-deploy-to-ecs-cannot-resolve-service-names-yelb
 
-Turned out this problem occurred with an existing VPC I was reusing. I
-don't know what it was missing, but deploying and using
-``vpc-defaulty.yml`` fixed my problem.
+Turned out this problem occurred with an existing VPC I was reusing:
+it did not set set the VPC with ``EnableDnsHostnames: true``;
+redeploying my VPC with this fixed my problem.
 
 I was even able to remove the ``networks.driver: bridge`` that
 mreferre's YELB repo indicates is critical, thought the ECS deploy
