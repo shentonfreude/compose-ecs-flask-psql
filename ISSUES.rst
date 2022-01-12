@@ -2,12 +2,23 @@
  Problems
 ==========
 
-I'm using
+On Mac with M1 I'm using
 * docker desktop 4.3.2
 * docker --version: 20.10.12
 * docker compose version: 2.2.3 (from homebrew insatll)
 
 turned on experimental:true
+
+On Mac with Intel I'm using:
+* Docker Desktop 4.3.0
+* Docker version 20.10.11, build dea9396
+* Docker Compose version v2.2.1
+* Docker Engine: buildkit: true, experimental: false
+
+``docker --context`` uknown but ``docker context create ecs NAME`` ok. wtf.
+
+On Air with Intel:
+...
 
 Compose doesn't know ``--context``
 ==================================
