@@ -1,6 +1,7 @@
-TAG_NAME	 := cshenton/flaskapp
-AWS_REGION       := us-east-1
-ECS_CONTEXT	 := wp-dev
+# Allow overrides for tag, region, context name
+TAG_NAME	 ?= cshenton/flaskapp
+AWS_REGION       ?= us-east-1
+ECS_CONTEXT	 ?= wp-dev
 
 AWS_ACCT         := $(shell aws sts get-caller-identity --query Account --output text)
 GIT_HASH         := $(shell git rev-parse --short HEAD || echo NOGIT)

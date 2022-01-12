@@ -26,10 +26,10 @@ Simple Demo Runs Locally
 I want a simple demo that shows an app server connecting to a DB, both
 running in containers. This works locally::
 
-  docker compose build
-  docker compose run
+  make build
+  make run
 
-(You can also use ``make build`` and ``make run``).
+These invoke ``docker compose build`` and ``docker compose up``.
 
 Now you can visit URLs http://localhost/createtable,
 http://localhost/insert (multiple times), and http://localhost/select.
