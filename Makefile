@@ -38,6 +38,11 @@ ecr_push: ecr_tag ecr_login
 ecr_list:
 	aws ecr describe-images --repository-name ${TAG_NAME}
 
+# If needed, create a VPC with DNS enabled, and our subnets etc;
+# put the VPC ID into the docker-compose.ecs.yml file.
+create_vpc:
+	aws cloudformation deploy --template-file vpc-defaulty.yml --stack-name vpc-defaulty
+
 # Explicit config files avoid using local-only features from .override.
 up:
 	AWS_ACCT=${AWS_ACCT} AWS_REGION=${AWS_REGION} \

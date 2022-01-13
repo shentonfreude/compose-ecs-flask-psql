@@ -1,6 +1,7 @@
 # VPC with IGW, Default Route, 2 public subnets.
 # VPC must EnableDnsHostnames for Fargate Service Discovery by Docker service name.
 # Subnets do not need MapPublicIpOnLaunch.
+# Deploy YAML: aws cloudformation deploy --template-file vpc-defaulty.yml --stack-name vpc-defaulty-yml
 
 Resources:
   VPC:

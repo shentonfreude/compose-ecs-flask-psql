@@ -13,8 +13,9 @@ it complained. I created a VPC but most not have gotten something
 wrong, because the app server was not able to resolve the database by
 its service name. I've overcome this and include a
 ``vpc-defaulty.yml`` CloudFormation you can use to deploy a VPC that
-allows Service Discovery to succeed. You need to use the console
-because the CLI doesn't accept YAML files; it only takes a minute.
+allows Service Discovery to succeed. It only takes a minute::
+
+  make create_vpc
 
 I'm using a ``Makefile`` to set AWS and ECS configs, as well as Docker
 tags. I'm also leveraging the Compose ``.override.`` file for builds
