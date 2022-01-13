@@ -2,31 +2,33 @@
  Problems
 ==========
 
-Recent Docker Compose does not work (with same CLI)
-===================================================
+I've got a 4-year old Intel Air running Docker Desktop 4.0.1 with
+Compose v2.0.0-rc.3 which runs this fine. But a newer Intel PowerBook
+had some problems, and my new M1 PowerBook had more problems.
 
-On Mac with M1 I'm using:
-* TODO: ``docker --context default compose build``?
-* TDOO: ``docker create context ecs NAME`` ?  
-* docker desktop 4.3.2
-* docker --version: 20.10.12
-* docker compose version: 2.2.3 (from homebrew insatll)
-* turned on experimental:true
+It turned out I had installed docker with ``homebrew`` on the M1, so I
+removed that. Manually uninstalling and reinstalling Docker (Desktop)
+from the Docker site fixed both the old Intel and the new M1. This
+caused the menubar Docker icon "About Docker Desktop" to report
+different versions than the CLI commands, since the homebrew version
+was getting called on the CLI on my M1. Derp!
 
-On Mac with Intel I'm using:
-* Broken: ``docker --context`` uknown (maybe use DOCKER_CONTEXT)
-* ``docker context create ecs NAME`` ok
-* Docker Desktop 4.3.0
-* Docker version 20.10.11, build dea9396
-* Docker Compose version v2.2.1
-* Docker Engine: buildkit: true, experimental: false
+Moral of the story: on macOS, install Docker Desktop (which includes
+docker engine, compose, and others) from Docker:
+https://docs.docker.com/desktop/mac/install/
 
-On old Mac Air with Intel -- works:
-* Docker Desktop: 4.0.1
-* Docker Engine: 20.10.8
-* Docker Compose: v2.0.0-rc.3
-* Docker Engine: experimental: false (no buildkit reference)
-* Experimental Features: [x] Use Docker Compose V2 release candidate
+Then, ``/usr/local/bin/docker`` will be symlinked into
+``/Applications/Docker.app/...``.
+
+Menubar Docker "About Docker Desktop" reports on my machines:
+* Docker Desktop 4.4.2 (73305)
+* Engine: 20.10.12
+* Compose: 1.29.2
+
+But the old Air, it reports:
+* Compose: 2.2.3
+
+CLI ``docker compose version`` on all three report 2.2.3; whatevs...
 
 Compose doesn't know ``--context``
 ==================================
@@ -36,14 +38,8 @@ When re-creating this on my new Mac M1 laptop, doing ``make build`` complained::
   AWS_ACCT=31415926535 AWS_REGION=us-east-1 docker --context default compose build
   unknown docker command: "compose compose"
 
-This is a bug in my version of Docker Compose, v2.1.1, which is
-reported fixed in 2.2.3. An update in the Docker Desktop GUI did not
-get me a recent enough version of Compose, so I had to install it
-with::
-
-  brew install docker-compose
-
-and follow its plugin symlink directions.
+This may be due to an old version of docker, or docker compose (which
+is built into recent versinos of docker).
 
 A workaround is to set the context with an environment variable
 instead of flag, like::
@@ -54,17 +50,14 @@ instead of flag, like::
 ========================================
 
 My M1 version of docker (and/or compose?) doesn't know about contexts::
-  docker context create ecs killmeh
+
+  docker context create ecs myecs
 
   "docker context create" requires exactly 1 argument.
   See 'docker context create --help'.
   Usage:  docker context create [OPTIONS] CONTEXT
   Create a context
 
-See bug report on enabling "experimental" features, but from Dec 2020: 
-https://github.com/docker/docker.github.io/issues/11845
-https://github.com/docker/docker.github.io/issues/11949
-https://github.com/docker/compose-cli/blob/main/INSTALL.md  (mreferre was last commit, but Linux only)
-
-Compose CLI with "context" support for ECS (no macos instructuions?)
-https://github.com/docker/compose-cli
+The only thing that fixed this was ensuring I was using the lates
+official Docker Desktop installation and not some old homebrew
+version.
