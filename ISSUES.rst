@@ -2,23 +2,31 @@
  Problems
 ==========
 
-On Mac with M1 I'm using
+Recent Docker Compose does not work (with same CLI)
+===================================================
+
+On Mac with M1 I'm using:
+* TODO: ``docker --context default compose build``?
+* TDOO: ``docker create context ecs NAME`` ?  
 * docker desktop 4.3.2
 * docker --version: 20.10.12
 * docker compose version: 2.2.3 (from homebrew insatll)
-
-turned on experimental:true
+* turned on experimental:true
 
 On Mac with Intel I'm using:
+* Broken: ``docker --context`` uknown (maybe use DOCKER_CONTEXT)
+* ``docker context create ecs NAME`` ok
 * Docker Desktop 4.3.0
 * Docker version 20.10.11, build dea9396
 * Docker Compose version v2.2.1
 * Docker Engine: buildkit: true, experimental: false
 
-``docker --context`` uknown but ``docker context create ecs NAME`` ok. wtf.
-
-On Air with Intel:
-...
+On old Mac Air with Intel -- works:
+* Docker Desktop: 4.0.1
+* Docker Engine: 20.10.8
+* Docker Compose: v2.0.0-rc.3
+* Docker Engine: experimental: false (no buildkit reference)
+* Experimental Features: [x] Use Docker Compose V2 release candidate
 
 Compose doesn't know ``--context``
 ==================================

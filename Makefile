@@ -14,7 +14,7 @@ AWS_ECR_TAG_HASH := ${AWS_ECR_URI}/${TAG_SUFFIXED}-${GIT_HASH}
 # We must build locally, and we can run it locally too
 
 build:
-	AWS_ACCT=${AWS_ACCT} AWS_REGION=${AWS_REGION} docker --context default compose build
+	AWS_ACCT=${AWS_ACCT} AWS_REGION=${AWS_REGION} docker --context default compose build --progress plain
 
 run:
 	docker --context default compose up

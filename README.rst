@@ -10,10 +10,11 @@ develop locally then deploy in the cloud.
 
 When deploying to an old account (from 2013) without a "Default VPC"
 it complained. I created a VPC but most not have gotten something
-wrong, because the app server was not able to resolve the database
-by its service name. I've overcome this and include a
+wrong, because the app server was not able to resolve the database by
+its service name. I've overcome this and include a
 ``vpc-defaulty.yml`` CloudFormation you can use to deploy a VPC that
-allows Service Discovery to succeed.
+allows Service Discovery to succeed. You need to use the console
+because the CLI doesn't accept YAML files; it only takes a minute.
 
 I'm using a ``Makefile`` to set AWS and ECS configs, as well as Docker
 tags. I'm also leveraging the Compose ``.override.`` file for builds
@@ -41,7 +42,10 @@ Now we want to deploy it to AWS ECS, which Docker Compose now can do
 for you! We'll need a VPC with at least 2 public subnets for the ALB.
 You can use the ``vpc-defaulty.yml`` to create one if you need; I had
 problems with others I used, and this was about as simple as I could
-make it.
+make it. Use the AWS CloudFormation console to create it, since the
+CLI doesn't accept YAML files :-(. Ensure you create it in the same
+region as your AWS_PROFILE and ECS_CONTEXT, otherwise the deploy won't
+find it.
 
 If you have a "Default VPC" and want to use it, comment out
 ``x-aws-vpc`` in ``docker-compose.ecs.yml``. If you have created one,
@@ -76,7 +80,17 @@ Then use another make target to tag, push the image, and deploy to ECS::
 
   make deploy
 
+Instead of editing the ``Makefile``, you can override the context like::
+
+   ECS_CONTEXT=vstudios2 make deploy
+
 This will take a few minutes to build, but should come up.
+
+Look in your CloudFormation stacks for ``compose-ecs-flask-psql``, it
+should have a Load Balancer (but doesn't show it in Outputs). Go to
+EC2 LoadBlancers and find it, and get the URL, and try it; mine is like:
+
+  http://compo-loadb-bogusvalue-66767911.us-east-1.elb.amazonaws.com/
 
 Does FlaskService fail to come up?
 ----------------------------------
