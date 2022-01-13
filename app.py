@@ -27,7 +27,10 @@ users = Table(
 
 @app.route("/")
 def hello():
-    return "Try urls: /createtable, /insert, /select"
+    return ('Try urls:'
+            ' <a href="/createtable">/createtable</href>,'
+            ' <a href="/insert">/insert</href>,'
+            ' <a href="/select">/select</href>')
 
 
 @app.route("/createtable")
